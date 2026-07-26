@@ -51,11 +51,29 @@ sudo rm -rf /usr/src/aic8800-1.0.9 /lib/firmware/aic8800DC /lib/firmware/aic8800
 
 Kernel API changes are handled with `HIGH_KERNEL_VERSION*` guards (see
 `aic8800_fdrv/rwnx_defs.h`). Most recently, `HIGH_KERNEL_VERSION_WDEV`
-covers the kernel 7.1 cfg80211 changes (wireless_dev-based key/station ops,
-anonymous action union in `struct ieee80211_mgmt`). If a future kernel
-breaks the build, check `/var/lib/dkms/aic8800/1.0.9/build/make.log`,
-compare against the new kernel headers, and add another guarded branch —
-see git history for worked examples.
+(`KERNEL_VERSION(7,1,0)`) covers the kernel 7.1 cfg80211 changes:
+key/station `cfg80211_ops` callbacks take `struct wireless_dev *` instead
+of `struct net_device *`, and the action union in `struct ieee80211_mgmt`
+became anonymous with a shared `action_code` field.
+
+`dkms.service` rebuilds the modules automatically when a new kernel is
+installed, as long as matching headers (`kernel-devel`) are present. To
+rebuild manually:
+
+```bash
+sudo dkms install aic8800/1.0.9 -k $(uname -r)
+```
+
+If a future kernel breaks the build:
+
+1. Check `journalctl -u dkms.service` and
+   `/var/lib/dkms/aic8800/1.0.9/build/make.log` for the compile error.
+2. Compare against the new kernel's headers, e.g.
+   `/usr/src/kernels/$(uname -r)/include/net/cfg80211.h` and
+   `include/linux/ieee80211.h`.
+3. Add a new branch guarded by a `HIGH_KERNEL_VERSION*` macro, keeping the
+   older branches so one source still builds for every installed kernel —
+   see git history for worked examples.
 
 ## Licensing
 
