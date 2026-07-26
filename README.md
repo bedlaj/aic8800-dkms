@@ -59,7 +59,8 @@ see git history for worked examples.
 
 ## Licensing
 
-- Driver source: GPL (`MODULE_LICENSE("GPL")`), Copyright RivieraWaves /
+- Driver source: GPL-2.0 (see `LICENSE`; `MODULE_LICENSE("GPL")` = GPLv2 or
+  later in kernel terms), Copyright RivieraWaves /
   AICSemi; redistributed unmodified apart from kernel-compatibility fixes.
 - `firmware/`: proprietary AICSemi firmware blobs, redistributed as-is from
   BrosTrend's official Linux driver package for convenience.
