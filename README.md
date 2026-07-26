@@ -18,7 +18,7 @@ AIC8800-based USB adapters, e.g.:
 ## Install (Fedora)
 
 ```bash
-git clone https://github.com/<you>/aic8800-dkms
+git clone https://github.com/bedlaj/aic8800-dkms
 cd aic8800-dkms
 sudo ./install.sh
 ```
