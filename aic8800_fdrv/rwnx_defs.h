@@ -76,6 +76,11 @@
 #define HIGH_KERNEL_VERSION4 KERNEL_VERSION(6, 3, 0)
 #endif
 
+/* kernel >= 7.1: cfg80211 key/station ops and sta notifiers take wireless_dev
+ * instead of net_device, and the inner union of ieee80211_mgmt.u.action is
+ * anonymous with a shared action_code field */
+#define HIGH_KERNEL_VERSION_WDEV KERNEL_VERSION(7, 1, 0)
+
 
 
 #if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
