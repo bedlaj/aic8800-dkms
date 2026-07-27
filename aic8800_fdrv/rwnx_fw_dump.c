@@ -532,7 +532,7 @@ int rwnx_dbgfs_register_fw_dump(struct rwnx_hw *rwnx_hw,
 
     BUILD_BUG_ON(sizeof(CONFIG_RWNX_UM_HELPER_DFLT) >=
                  sizeof(rwnx_debugfs->helper_cmd));
-    strncpy(rwnx_debugfs->helper_cmd,
+    strscpy(rwnx_debugfs->helper_cmd,
             CONFIG_RWNX_UM_HELPER_DFLT, sizeof(rwnx_debugfs->helper_cmd));
     INIT_WORK(&rwnx_debugfs->helper_work, rwnx_um_helper_work);
     DEBUGFS_ADD_FILE(um_helper, dir_drv, S_IWUSR | S_IRUSR);

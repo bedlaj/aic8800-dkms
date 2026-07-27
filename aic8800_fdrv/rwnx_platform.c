@@ -1064,7 +1064,7 @@ static int rwnx_plat_ihex_fw_upload(struct rwnx_plat *rwnx_plat, u8* fw_addr,
 
 #define IHEX_READ8(_val, _cs) {                  \
         hex_buff[2] = 0;                         \
-        strncpy(hex_buff, src, 2);               \
+        memcpy(hex_buff, src, 2);                \
         if (kstrtou8(hex_buff, 16, &_val))       \
             goto end;                            \
         src += 2;                                \
@@ -1074,7 +1074,7 @@ static int rwnx_plat_ihex_fw_upload(struct rwnx_plat *rwnx_plat, u8* fw_addr,
 
 #define IHEX_READ16(_val) {                        \
         hex_buff[4] = 0;                           \
-        strncpy(hex_buff, src, 4);                 \
+        memcpy(hex_buff, src, 4);                  \
         if (kstrtou16(hex_buff, 16, &_val))        \
             goto end;                              \
         src += 4;                                  \
@@ -1083,7 +1083,7 @@ static int rwnx_plat_ihex_fw_upload(struct rwnx_plat *rwnx_plat, u8* fw_addr,
 
 #define IHEX_READ32(_val) {                              \
         hex_buff[8] = 0;                                 \
-        strncpy(hex_buff, src, 8);                       \
+        memcpy(hex_buff, src, 8);                        \
         if (kstrtouint(hex_buff, 16, &_val))             \
             goto end;                                    \
         src += 8;                                        \
@@ -1094,7 +1094,7 @@ static int rwnx_plat_ihex_fw_upload(struct rwnx_plat *rwnx_plat, u8* fw_addr,
 #define IHEX_READ32_PAD(_val, _nb) {                    \
         memset(hex_buff, '0', 8);                       \
         hex_buff[8] = 0;                                \
-        strncpy(hex_buff, src, (2 * _nb));              \
+        memcpy(hex_buff, src, (2 * _nb));               \
         if (kstrtouint(hex_buff, 16, &_val))            \
             goto end;                                   \
         src += (2 * _nb);                               \
@@ -3034,7 +3034,7 @@ int ParseQualifiedString(char *In, u32 *Start, char *Out, char LeftQualifier, ch
     if (c == '\0')
         return 0;
     j = (*Start) - 2;
-    strncpy((char *)Out, (const char *)(In + i), j - i + 1);
+    memcpy(Out, In + i, j - i + 1);
     return 1;
 }
 
@@ -3247,7 +3247,7 @@ void rwnx_plat_powerlimit_parsing(char *buffer, int size, char *cc)
 					goto exit;
 				}
 
-				strncpy(reg_name[forCnt], szLine + i_cc, i - i_cc);
+				memcpy(reg_name[forCnt], szLine + i_cc, i - i_cc);
 				reg_name[forCnt][i - i_cc] = '\0';
 				AICWFDBG(LOGINFO, "reg_name: %s\n", reg_name[forCnt]);
 
