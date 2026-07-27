@@ -89,6 +89,27 @@ that changed, it opens an issue with the diff. Run `./check-upstream.sh`
 locally for the same check, and `./check-upstream.sh --update` to refresh
 the baseline after porting the changes.
 
+### Updating to a new upstream release
+
+The `vendor` branch holds the pristine upstream source; `main` is
+vendor + our kernel-compat patches. When the upstream check reports a new
+release (say 1.0.10):
+
+```bash
+git checkout vendor
+# extract the new deb's /usr/src/aic8800-<version> over the tree
+curl -fsSL https://linux.brostrend.com/pool/main/a/aic8800/aic8800-dkms_<version>_all.deb -o /tmp/aic.deb
+cd /tmp && ar x aic.deb && tar -xf data.tar.*
+rsync -a --delete --exclude=.git --exclude=firmware --exclude={install.sh,README.md,LICENSE,check-upstream.sh,upstream,.github} \
+    /tmp/usr/src/aic8800-<version>/ <repo>/
+git commit -am "Vendor aic8800 <version>"
+git checkout main && git merge vendor   # 3-way merge keeps our patches
+./check-upstream.sh --update
+```
+
+Only hunks where upstream and our patches touch the same lines need
+manual conflict resolution.
+
 A second weekly job (`.github/workflows/fedora-build.yml`) does a full
 `dkms build` in `fedora:latest` and `fedora:rawhide` containers against
 the newest `kernel-devel` headers, so a kernel API break is noticed —
