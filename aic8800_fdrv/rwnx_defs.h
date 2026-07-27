@@ -81,6 +81,10 @@
  * anonymous with a shared action_code field */
 #define HIGH_KERNEL_VERSION_WDEV KERNEL_VERSION(7, 1, 0)
 
+/* kernel >= 7.2: the remain_on_channel op takes an optional rx_addr filter
+ * (ignored: hardware listens on the primary address as before) */
+#define HIGH_KERNEL_VERSION_ROC_RX_ADDR KERNEL_VERSION(7, 2, 0)
+
 
 
 #if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
