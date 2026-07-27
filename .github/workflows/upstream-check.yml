@@ -1,0 +1,50 @@
+name: upstream-check
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'   # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare upstream deb against baseline
+        id: check
+        run: |
+          set +e
+          ./check-upstream.sh >drift.txt 2>&1
+          status=$?
+          cat drift.txt
+          exit $status
+
+      - name: Open issue on drift
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --label upstream-drift --json number --jq length)
+          if [ "$open" != "0" ]; then
+            echo "drift issue already open, skipping"
+            exit 0
+          fi
+          {
+            echo "The weekly check found that https://linux.brostrend.com/aic8800-dkms.deb no longer matches \`upstream/SHA256SUMS\`. Review the diff below for security fixes, port anything relevant, then run \`./check-upstream.sh --update\` and commit the new baseline."
+            echo
+            echo '```'
+            head -c 60000 drift.txt
+            echo '```'
+            echo
+            echo "Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > issue-body.md
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Upstream aic8800-dkms.deb changed" \
+            --label upstream-drift \
+            --body-file issue-body.md
