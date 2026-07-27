@@ -1,3 +1,6 @@
+Release: pool/main/a/aic8800/aic8800-dkms_1.0.9-0b1_all.deb
+Commit: d36c204ae89f361a2e05be9e6271a696dcafdf24
+Deb: fd83788d564bb3018e382e236c911a616275e769740e622d42934b5a6f0d714a
 Version: 1.0.9-0b1
 00c6e0a326ba67d7dc2fb28079e5f8e53aa2e4abe59603e5fb2b43db503e2324  ./lib/firmware/aic8800D80/aic_powerlimit_8800d80.txt
 56c039d10af63c888b18890f508968a143f034de279fd2c4ec7ee65133e3dbdb  ./lib/firmware/aic8800D80/aic_userconfig_8800d80.txt

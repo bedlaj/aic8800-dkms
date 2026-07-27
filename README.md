@@ -79,10 +79,13 @@ If a future kernel breaks the build:
 
 This tree is a fork of upstream 1.0.9 (see below), so upstream changes —
 including possible security fixes — must be ported by hand. A weekly
-GitHub Actions job (`.github/workflows/upstream-check.yml`) downloads the
-official BrosTrend package and compares its version and payload checksums
-against the committed baseline (`upstream/SHA256SUMS`); if upstream
-changed, it opens an issue with the diff. Run `./check-upstream.sh`
+GitHub Actions job (`.github/workflows/upstream-check.yml`) watches
+BrosTrend's driver repo
+([brostrend/linux.brostrend.com](https://github.com/brostrend/linux.brostrend.com),
+which serves linux.brostrend.com): it pins the current release (versioned
+pool deb named by their `aic8800-dkms.deb` pointer file), their release
+commit, and per-file payload checksums in `upstream/SHA256SUMS`; if any of
+that changed, it opens an issue with the diff. Run `./check-upstream.sh`
 locally for the same check, and `./check-upstream.sh --update` to refresh
 the baseline after porting the changes.
 

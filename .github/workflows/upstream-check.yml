@@ -17,6 +17,8 @@ jobs:
 
       - name: Compare upstream deb against baseline
         id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set +e
           ./check-upstream.sh >drift.txt 2>&1
