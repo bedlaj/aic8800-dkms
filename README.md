@@ -75,10 +75,29 @@ If a future kernel breaks the build:
    older branches so one source still builds for every installed kernel —
    see git history for worked examples.
 
-## Licensing
+## Upstream tracking
+
+This tree is a fork of upstream 1.0.9 (see below), so upstream changes —
+including possible security fixes — must be ported by hand. A weekly
+GitHub Actions job (`.github/workflows/upstream-check.yml`) downloads the
+official BrosTrend package and compares its version and payload checksums
+against the committed baseline (`upstream/SHA256SUMS`); if upstream
+changed, it opens an issue with the diff. Run `./check-upstream.sh`
+locally for the same check, and `./check-upstream.sh --update` to refresh
+the baseline after porting the changes.
+
+## Licensing / attribution
 
 - Driver source: GPL-2.0 (see `LICENSE`; `MODULE_LICENSE("GPL")` = GPLv2 or
-  later in kernel terms), Copyright RivieraWaves /
-  AICSemi; redistributed unmodified apart from kernel-compatibility fixes.
-- `firmware/`: proprietary AICSemi firmware blobs, redistributed as-is from
-  BrosTrend's official Linux driver package for convenience.
+  later in kernel terms), Copyright RivieraWaves / AICSemi; redistributed
+  unmodified apart from kernel-compatibility fixes.
+- `firmware/`: AICSemi firmware blobs (no explicit license), redistributed
+  as-is for convenience.
+
+Both driver source and firmware were obtained from BrosTrend's official
+Linux driver package `aic8800-dkms` 1.0.9
+([linux.brostrend.com/aic8800-dkms.deb](https://linux.brostrend.com/aic8800-dkms.deb)),
+maintained by BrosTrend at
+[github.com/brostrend/linux.brostrend.com](https://github.com/brostrend/linux.brostrend.com).
+The chipset, firmware, and vendor driver are developed by
+[AICSemi](https://www.aicsemi.com/) (AIC Semiconductor).
