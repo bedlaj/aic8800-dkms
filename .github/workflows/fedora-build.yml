@@ -56,7 +56,12 @@ jobs:
 
       - name: Collect build log
         if: failure()
-        run: cp /var/lib/dkms/aic8800/1.0.9/build/make.log . 2>/dev/null || echo "make.log unavailable" > make.log
+        run: |
+          cp /var/lib/dkms/aic8800/1.0.9/build/make.log . 2>/dev/null \
+            || echo "make.log unavailable" > make.log
+          echo "::group::make.log (tail)"
+          tail -c 20000 make.log
+          echo "::endgroup::"
 
       - name: Open issue on scheduled failure
         if: failure() && github.event_name == 'schedule'
