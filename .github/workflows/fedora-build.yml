@@ -46,6 +46,10 @@ jobs:
           kver=$(rpm -q kernel-devel --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort -V | tail -1)
           echo "building against kernel-devel $kver"
           echo "kver=$kver" >> "$GITHUB_OUTPUT"
+          # container has headers but no kernel package, so the /lib/modules
+          # symlink dkms expects is missing
+          mkdir -p "/lib/modules/$kver"
+          ln -sfn "/usr/src/kernels/$kver" "/lib/modules/$kver/build"
           cp -a . /usr/src/aic8800-1.0.9
           dkms add aic8800/1.0.9
           dkms build aic8800/1.0.9 -k "$kver"
