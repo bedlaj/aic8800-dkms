@@ -23,7 +23,7 @@ tar -xf data.tar.* -C payload
 tar -xf control.tar.* -C control
 {
     grep ^Version: control/control
-    (cd payload && find . -type f -print0 | sort -z | xargs -0 sha256sum)
+    (cd payload && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum)
 } > current
 
 if [ "${1-}" = --update ]; then
