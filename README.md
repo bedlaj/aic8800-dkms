@@ -89,6 +89,13 @@ that changed, it opens an issue with the diff. Run `./check-upstream.sh`
 locally for the same check, and `./check-upstream.sh --update` to refresh
 the baseline after porting the changes.
 
+A second weekly job (`.github/workflows/fedora-build.yml`) does a full
+`dkms build` in `fedora:latest` and `fedora:rawhide` containers against
+the newest `kernel-devel` headers, so a kernel API break is noticed —
+via an auto-filed issue with the `make.log` excerpt — before (rawhide) or
+as soon as (latest) it reaches users. It also runs on every push touching
+the driver source.
+
 ## Licensing / attribution
 
 - Driver source: GPL-2.0 (see `LICENSE`; `MODULE_LICENSE("GPL")` = GPLv2 or

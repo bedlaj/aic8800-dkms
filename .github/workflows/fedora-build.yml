@@ -1,0 +1,83 @@
+name: fedora-build
+
+# Build the DKMS modules against the newest Fedora kernel headers so kernel
+# API breakage is caught early: weekly against fedora:latest (what users
+# run) and fedora:rawhide (what they will run), plus on every push touching
+# the driver source. Scheduled failures open a kernel-break issue.
+
+on:
+  schedule:
+    - cron: '43 6 * * 1'   # Mondays 06:43 UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aic8800_fdrv/**'
+      - 'aic_load_fw/**'
+      - 'dkms.conf'
+      - 'driverctl'
+      - 'Makefile'
+      - '.github/workflows/fedora-build.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [latest, rawhide]
+    container:
+      image: registry.fedoraproject.org/fedora:${{ matrix.release }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dkms, toolchain and newest kernel headers
+        run: >
+          dnf install -y --setopt=install_weak_deps=False
+          dkms kernel-devel gcc make elfutils-libelf-devel openssl kmod
+          diffutils gh
+
+      - name: Build modules with dkms
+        id: build
+        run: |
+          kver=$(rpm -q kernel-devel --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort -V | tail -1)
+          echo "building against kernel-devel $kver"
+          echo "kver=$kver" >> "$GITHUB_OUTPUT"
+          cp -a . /usr/src/aic8800-1.0.9
+          dkms add aic8800/1.0.9
+          dkms build aic8800/1.0.9 -k "$kver"
+
+      - name: Collect build log
+        if: failure()
+        run: cp /var/lib/dkms/aic8800/1.0.9/build/make.log . 2>/dev/null || echo "make.log unavailable" > make.log
+
+      - name: Open issue on scheduled failure
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          kver="${{ steps.build.outputs.kver }}"
+          title="Build fails on Fedora ${{ matrix.release }}, kernel $kver"
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --label kernel-break --search "\"$title\" in:title" \
+            --json number --jq length)
+          if [ "$open" != "0" ]; then
+            echo "issue already open, skipping"
+            exit 0
+          fi
+          {
+            echo "Weekly build of \`aic8800/1.0.9\` against the newest Fedora ${{ matrix.release }} kernel headers failed."
+            echo
+            echo "Kernel: \`$kver\` — likely a kernel API change; see \"Kernel compatibility / porting\" in README.md for the porting workflow."
+            echo
+            echo '```'
+            tail -c 60000 make.log
+            echo '```'
+            echo
+            echo "Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > issue-body.md
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "$title" --label kernel-break --body-file issue-body.md

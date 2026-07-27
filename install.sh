@@ -43,8 +43,9 @@ else
     echo "Copying driver source to $DEST ..."
     mkdir -p "$DEST"
     # exclude repo metadata and firmware; DKMS only needs the module source
-    (cd "$SRC_DIR" && tar --exclude=.git --exclude=firmware --exclude=install.sh \
-        --exclude=README.md --exclude=CLAUDE.md -cf - .) | tar -xf - -C "$DEST"
+    (cd "$SRC_DIR" && tar --exclude=.git --exclude=.github --exclude=firmware \
+        --exclude=install.sh --exclude=README.md --exclude=LICENSE \
+        --exclude=check-upstream.sh --exclude=upstream -cf - .) | tar -xf - -C "$DEST"
 fi
 
 # --- dkms build + install ---------------------------------------------------
